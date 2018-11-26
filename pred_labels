@@ -3,13 +3,14 @@ inmodel=zeros(size(train_inputs,2),size(train_labels,2));
 for i=1:size(train_labels,2)
 [b,se,pval,inmodel(:,i),stats,nextstep,history] = stepwisefit(train_inputs,train_labels(:,i));
 end
-inmodel=inmodel(1);
-for i=2:size(train_lables,2)
-    inmodel=inmodel+inmodel(i);
+in=inmodel(:,1);
+for i=2:size(train_labels,2)
+    in=inmodel+inmodel(:,i);
 end
-in=logical(inmodel);
-train_reduced=train_inputs(:,inmodel);
-test_reduced=test_inputs(:,inmodel);
+in(in>0)=1;
+in=logical(in);
+train_reduced=train_inputs(:,in);
+test_reduced=test_inputs(:,in);
 pred_labels=nn(train_inputs,test_inputs,test_reduced);
 
 end
