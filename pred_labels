@@ -11,6 +11,6 @@ in(in>0)=1;
 in=logical(in);
 train_reduced=train_inputs(:,in);
 test_reduced=test_inputs(:,in);
-pred_labels=nn(train_inputs,test_inputs,test_reduced);
+pred_labels=nn(train_reduced,test_inputs,test_reduced);
 
 end
