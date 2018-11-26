@@ -1,0 +1,14 @@
+function test_Y=nn(train_X,train_Y,test_X)
+%choose number of neurons in a layer
+net=feedforwardnet(10);
+
+
+net = configure(net,train_X.',train_Y.');
+net = trainlm(net,train_X.',train_Y.');
+
+test_Y=net(test_X.');
+test_Y=test_Y.';
+
+
+
+end
