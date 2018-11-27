@@ -6,7 +6,7 @@ for i = 1:10
     test = (indices == i); 
     train = ~test;
     output= predict_labels(train_inputs(train,:),train_labels(train,:),train_inputs(test,:));
-    err(i)=norm(output-train_labels(test,:));
+     err(i)=error_metric(output,train_labels(test,:));
 end
 
 errbar=mean(err);
