@@ -1,16 +1,11 @@
 function pred_labels=predict_labels(train_inputs,train_labels,test_inputs)
-inmodel=zeros(size(train_inputs,2),size(train_labels,2));
-for i=1:size(train_labels,2)
-[b,se,pval,inmodel(:,i),stats,nextstep,history] = stepwisefit(train_inputs,train_labels(:,i));
-end
-in=inmodel(:,1);
-for i=2:size(train_labels,2)
-    in=inmodel+inmodel(:,i);
-end
-in(in>0)=1;
-in=logical(in);
-train_reduced=train_inputs(:,in);
-test_reduced=test_inputs(:,in);
+
+
+[b,se,pval,inmodel,stats,nextstep,history] = stepwisefit(train_inputs,train_labels(:,1));
+
+train_reduced=train_inputs(:,inmodel);
+test_reduced=test_inputs(:,inmodel);
 pred_labels=nn(train_reduced,test_inputs,test_reduced);
 
 end
+
