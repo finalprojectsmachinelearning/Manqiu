@@ -5,7 +5,8 @@ function pred_labels=predict_labels(train_inputs,train_labels,test_inputs)
 
 train_reduced=train_inputs(:,inmodel);
 test_reduced=test_inputs(:,inmodel);
-pred_labels=nn(train_reduced,test_inputs,test_reduced);
+pred_labels=nn(train_reduced,train_labels,test_reduced);
 
 end
+
 
