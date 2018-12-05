@@ -1,12 +1,59 @@
 function pred_labels=predict_labels(train_inputs,train_labels,test_inputs)
 
+n = size(train_inputs,1); 
+m = size(test_inputs, 1); 
+p = size(train_inputs,2);
 
-[b,se,pval,inmodel,stats,nextstep,history] = stepwisefit(train_inputs,train_labels(:,1));
+% DIMENSIONALITY REDUCTION 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% step 1 
+% feature selection based on NaN topics and topic frequencies 
+% topics_kept = csvread('topics_kept_features.csv'); 
+demo_inputs_train = train_inputs(:, 1:21); 
+demo_inputs_test = test_inputs(:, 1:21); 
 
-train_reduced=train_inputs(:,inmodel);
-test_reduced=test_inputs(:,inmodel);
-pred_labels=nn(train_reduced,train_labels,test_reduced);
+topics_inputs_train = train_inputs(:, 22:p); 
+topics_inputs_test = test_inputs(:, 22:p); 
+
+
+% PCA on topics_inputs_train
+% 1. not sparse - mc for PCA is ok! 
+all_topics = vertcat(topics_inputs_train, topics_inputs_test); 
+
+[~,score,latent,~,~,~] = pca(all_topics); 
+summ = sum(latent); 
+sum_eigen_value = 0; 
+variance_explained = zeros(size(latent,1),1); 
+
+for i = 1:size(latent,1) 
+    sum_eigen_value = sum_eigen_value + latent(i); 
+    percent_var_explained = 100*sum_eigen_value/summ; 
+    variance_explained(i) = percent_var_explained; 
+end 
+
+pc_num = sum(variance_explained < 99.5); % number of PC used for all_topics 
+
+train_topics = score(1:n,1:pc_num); 
+test_topics = score((n+1):(n+m), 1:pc_num);
+
+
+% reduced train_inputs and test_inputs
+train_reduced= horzcat(demo_inputs_train, train_topics); 
+test_reduced = horzcat(demo_inputs_test, test_topics);  
+pred_labels=cal(train_reduced,train_labels,test_reduced);
 
 end
 
+function test_Y=cal(train_X,train_Y,test_X)
+train_Y=double(train_Y);
+test_Y=zeros(size(test_X,1),9);
+for i=1:9
+  Mdl1= fitrlinear(train_X,train_Y(:,i),'Learner','leastsquares','Regularization','ridge','Lambda',0.00001);
+  Mdl2=fitrensemble(train_X,train_Y(:,i));
+  prec_y1=predict(Mdl1,test_X);
+  prec_y2=predict(Mdl2,test_X);
+  test_Y(:,i)=1*prec_y1+0*prec_y2;
+  
+end
 
+end
