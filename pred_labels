@@ -52,7 +52,7 @@ for i=1:9
   Mdl2=fitrensemble(train_X,train_Y(:,i));
   prec_y1=predict(Mdl1,test_X);
   prec_y2=predict(Mdl2,test_X);
-  test_Y(:,i)=1*prec_y1+0*prec_y2;
+  test_Y(:,i)=0.5*prec_y1+0.5*prec_y2;
   
 end
 
